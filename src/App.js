@@ -1,25 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
+import styled from "styled-components";
+import HomeScreen from "./pages/HomeScreen";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import CheckoutScreen from "./pages/CheckoutScreen";
+import LoginPage from "./pages/LoginPage";
+import { useEffect } from "react";
+import { auth, onAuthStateChanged } from "./firebase";
+import { useDispatch } from "react-redux";
+import { setUser } from "./store/userSlice";
+import PaymentScreen from "./pages/PaymentScreen";
 
 function App() {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        dispatch(setUser({ user: user.email }));
+      } else {
+        dispatch(setUser({ user: null }));
+      }
+    });
+  }, [dispatch]);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <AppCom>
+        <Routes>
+          <Route path="/checkout/payment" element={<PaymentScreen />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/checkout" element={<CheckoutScreen />} />
+          <Route path="/" element={<HomeScreen />} />
+        </Routes>
+      </AppCom>
+    </Router>
   );
 }
 
 export default App;
+
+const AppCom = styled.div``;
